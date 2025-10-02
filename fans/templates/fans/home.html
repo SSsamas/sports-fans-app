@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sports Fans App</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="{{ theme }}">
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="brand">
+                <img class="logo" src="{% static 'images/sport1.jpg' %}" alt="Sports logo">
+                <span class="brand-title">{{ t.brand }}</span>
+            </div>
+            <nav class="nav-actions">
+                <span class="pill">{{ t.theme }}: {{ theme|capfirst }}</span>
+                <span class="pill">{{ t.language }}: {{ language|upper }}</span>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">{{ t.hero_title }}</h1>
+                <p class="hero-subtitle">{{ t.hero_subtitle }}</p>
+            </div>
+            <div class="hero-media">
+                <img class="hero-img" src="{% static 'images/sport2.jpg' %}" alt="Sports collage">
+            </div>
+        </div>
+    </section>
+
+    <main class="container layout">
+        <section class="section teams">
+            <h2 class="section-title">{{ t.popular_teams }}</h2>
+            <div class="cards">
+                {% for team in teams %}
+                <article class="card team-card">
+                    <div class="card-header">
+                        <span class="badge sport-{{ team.sport|lower }}">{{ team.sport }}</span>
+                        <h3 class="card-title">{{ team.name }}</h3>
+                    </div>
+                    <p class="card-text muted">{{ team.description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <aside class="section sidebar">
+            <form method="post" action="{% url 'set_settings' %}" class="card form-card">
+                {% csrf_token %}
+                <h2 class="section-title">{{ t.customize }}</h2>
+
+                <div class="form-group">
+                    <label class="form-label">{{ t.favorite_teams }}</label>
+                    <div class="checkbox-grid">
+                        {% for team in teams %}
+                        <label class="checkbox">
+                            <input type="checkbox" name="teams" value="{{ team.name }}" {% if team.name in favorite_teams %}checked{% endif %}>
+                            <span>{{ team.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="theme">{{ t.theme }}</label>
+                        <select id="theme" name="theme">
+                            <option value="light" {% if theme == 'light' %}selected{% endif %}>Light</option>
+                            <option value="dark" {% if theme == 'dark' %}selected{% endif %}>Dark</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="language">{{ t.language }}</label>
+                        <select id="language" name="language">
+                            <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+                            <option value="ru" {% if language == 'ru' %}selected{% endif %}>Русский</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn primary">{{ t.save }}</button>
+            </form>
+
+            <div class="card status-card">
+                <h3 class="card-title">{{ t.current_prefs }}</h3>
+                <p><strong>{{ t.theme }}:</strong> {{ theme|capfirst }}</p>
+                <p><strong>{{ t.language }}:</strong> {{ language|upper }}</p>
+                <p><strong>{{ t.favorites }}:</strong>
+                    {% if favorite_teams %}
+                        <span class="chips">
+                            {% for ft in favorite_teams %}
+                                <span class="chip">{{ ft }}</span>
+                            {% endfor %}
+                        </span>
+                    {% else %}
+                        <span class="muted">{{ t.no_teams }}</span>
+                    {% endif %}
+                </p>
+                <p class="muted small">{{ t.last_page }}: {{ last_page }}</p>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="muted">{{ t.footer }} • {{ language|upper }}</p>
+        </div>
+    </footer>
+</body>
+</html>
